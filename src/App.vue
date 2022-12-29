@@ -89,7 +89,6 @@ import { ChevronDownIcon } from "@heroicons/vue/20/solid";
 
 
 // Variables
-let active = ref(false);
 let avatar = ref("assets/images/photo.jpg");
 let isLogin = ref(false);
 let isPaused = ref(false);
@@ -99,6 +98,7 @@ let resultTime = ref('');
 let userName = ref('');
 let LocalworkEntryIn;
 const api = new APIrequest("work-entries");
+let employeeId = '';
 
 
 
@@ -200,30 +200,51 @@ const diffTime = (startTime,endTime,ShowDays=false)=>{
 const actualizar = () => {
   api.get().then((data) => {
     
-    if (data.length){
-    employee.value = { ...data[data.length-1] };
+   let lastID = localStorage.getItem('lastID',data.id) || '';
+   let f=false;
 
-  //no podemos obtener ultimos datos
-  //del empleado porque no tiene ID ultimo documento y obtenemos todos 500 linias de base de datos    
+   if (data.length){
+   
+      console.log('lastID',lastID);
 
+     if (lastID!=''){
+       employee.value = { ...data.filter( (el)=>{ return el.id==lastID})[0]};
+
+        if (!Object.keys(employee.value).length===0){
+              // found object 
+              console.log('found object');
+              f=true;  
+              employee.value = { ...data[data.length-1] };
+        }else{
+          // not found last ID
+          console.log('not found object - get last record');
+          employee.value = { ...data[data.length-1] };
+        } 
+
+     }else{
+       employee.value = { ...data[data.length-1] };
+     }
+     
     console.log('GET actualizar',employee.value);
 
-    isLogin.value = employee.value.employee.workStatus == "online" ? true : false;
-    isPaused.value = employee.value.employee.workStatus == "paused" ? true : false;
-
-    workTime.value = isLogin.value ? workTime.value = diffTime(employee.value.workEntryIn.date,employee.value.workEntryOut.date): '';
-
     userName.value = employee.value.employee.firstName +' '+employee.value.employee.lastName ;
-    
-    LocalworkEntryIn=employee.value.workEntryIn.date;
+    LocalworkEntryIn = '00:00:00';
+    employeeId = employee.value.employee.id;
 
+      if (f){
+      isLogin.value = employee.value.employee.workStatus == "online" ? true : false;
+      isPaused.value = employee.value.employee.workStatus == "paused" ? true : false;
+      workTime.value = !isLogin.value ? workTime.value = diffTime(employee.value.workEntryIn.date,employee.value.workEntryOut.date): '';
+      LocalworkEntryIn = isLogin.value ? employee.value.workEntryIn.date : '00:00:00';
+      }
     }
+
   });
 };
 
 const Entrar = () => {
   let obj = {
-    employeeId: employee.value.employee.id,
+    employeeId: employeeId,
     workEntryIn: {
       coordinates: {
         latitude: postion.latitude,
@@ -234,10 +255,14 @@ const Entrar = () => {
 
   api.post("/clock-in", obj).then((data) => {
     console.log("POST Entrar :", data);
+    if (data){
+    localStorage.setItem('lastID',data.id);
     isLogin.value = data.employee.workStatus == "online" ? true : false;
     workTime.value = '00:00:00';
     LocalworkEntryIn =data.workEntryIn.date;
+
     StartVirtualTimer();
+    }
 
   });
 };
@@ -249,7 +274,7 @@ const Pausar = ()=>{
 
 const Salir = () => {
   let obj = {
-    employeeId: employee.value.employee.id,
+    employeeId: employeeId,
     workEntryOut: {
       coordinates: {
         latitude: postion.latitude,
@@ -265,6 +290,7 @@ const Salir = () => {
     //isLogin.value = false;
     resultTime.value =  diffTime(data.workEntryIn.date,data.workEntryOut.date);
     isPaused.value=false;
+    localStorage.removeItem('lastID');
     StopVirtualTimer();
   });
 };
