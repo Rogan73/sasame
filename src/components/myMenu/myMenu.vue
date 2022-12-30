@@ -1,7 +1,7 @@
 <template>
 
           <div class="relative" v-if="active">
-            <myMenuItems :active="active" :items="items" @click="selitem" />
+            <myMenuItems class="mmenu" :active="active" :items="items" @click="selitem" />
             <myMenuSubItems :active="SubMenuAcitve && active" :items="submenu" :position="submenu.position" @click="selitem"/>
           </div>
 
@@ -38,3 +38,14 @@ watch(() => props.active,(v) => {
 
 
 </script>
+
+<style scoped>
+.mmenu::after {
+    content: ''; 
+    position: absolute;
+    right: 30px; 
+    top: -20px;
+    border: 10px solid transparent;
+    border-bottom: 10px solid white;
+   }
+</style>

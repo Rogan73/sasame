@@ -51,6 +51,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import APIrequest from "./services/api";
+import Geolocation from "./services/geo";
 import myBtn from "./components/myBtn.vue";
 import myMenu from "./components/myMenu/myMenu.vue";
 import { ChevronDownIcon } from "@heroicons/vue/20/solid";
@@ -116,7 +117,7 @@ let arMenuItems = ref([
 
 onMounted(() => {
   actualizar();
-  geo();
+  //geo();
 
 
 
@@ -249,36 +250,15 @@ const Salir = () => {
 };
 
 
-
-let position = { latitude: 0, longitude: 0 };
-
-const geo_options = {
-  enableHighAccuracy: true,
-  timeout: 5000,
-  maximumAge: 0,
-};
-
-const geo_success = (pos) => {
-  position.latitude = pos.coords.latitude;
-  position.longitude = pos.coords.longitude;
-};
-
-const geo_error = (err) => {
-  console.warn(`ERROR(${err.code}): ${err.message}`);
-};
-
-const geo = () => {
-  if (navigator.geolocation)
-    navigator.geolocation.getCurrentPosition(geo_success, geo_error, geo_options);
-};
-// end Geolocation
+//Geolocation
+let position = {};
+new Geolocation().getLocation().then(data=>position={...data} );
 
 // Menu
 let MenuActive = ref(false);
 
-const OpenMenu = () => {
-  MenuActive.value = true;
-};
+const OpenMenu = () => MenuActive.value = true;
+
 
 const SelMenuItem = (item) => {
   MenuActive.value = false;
@@ -292,15 +272,11 @@ document.addEventListener("click", (event) => {
 
 // VirtualTImer
 let VirtualTimer;
-
-let workTimeOrg = 0;
 const StartVirtualTimer = () => {
   VirtualTimer = setInterval(() => {
     workTime.value = diffTime(LocalworkEntryIn, new Date().toString());
   }, 1000);
 };
+const StopVirtualTimer = () =>   clearInterval(VirtualTimer)
 
-const StopVirtualTimer = () => {
-  clearInterval(VirtualTimer);
-};
 </script>
