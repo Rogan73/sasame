@@ -1,7 +1,7 @@
 
 # Time Tracker
 
-## Vue 3 + Vite + Tailwind 
+## Vue 3 + Vite + Tailwind + Axios
 
 ### Components
 myBtn, myMenu
