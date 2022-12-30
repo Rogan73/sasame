@@ -41,11 +41,12 @@ watch(() => props.active,(v) => {
 
 <style scoped>
 .mmenu::after {
-    content: ''; 
+    content: '';
     position: absolute;
-    right: 30px; 
-    top: -20px;
-    border: 10px solid transparent;
+    right: 30px;
+    top: -15px;
+    border: 5px solid transparent;
     border-bottom: 10px solid white;
    }
+ 
 </style>

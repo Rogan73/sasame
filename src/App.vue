@@ -38,7 +38,7 @@
           <ChevronDownIcon
             @click.self="OpenMenu"
             el_menu
-            class="ml-2 -mr-1 h-5 w-5 text-slate-600 text-violet-200 hover:text-black"
+            class="ml-2 -mr-1 h-5 w-5 text-slate-600 hover:text-black"
             aria-hidden="true"
           />
           <myMenu :active="MenuActive" :items="arMenuItems" @click="SelMenuItem" />
