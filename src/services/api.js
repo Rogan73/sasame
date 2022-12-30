@@ -4,6 +4,11 @@ export default class APIrequest {
 
     resource;
 
+    constructor(resource) {
+        if (!resource) throw new Error("No se proporciona el recurso");
+        this.resource = resource;
+    }
+
     async get(id) {
         try {
             const response = await axios.get(this.getUrl(id));
@@ -22,16 +27,7 @@ export default class APIrequest {
         }
     }
 
-    constructor(resource) {
-        if (!resource) throw new Error("No se proporciona el recurso");
-        this.resource = resource;
-    }
+    getUrl(id = "") { return `/api/${this.resource}`; }
 
-    getUrl(id = "") {
-        return `/api/${this.resource}`;
-    }
-
-    Errors(err) {
-        console.log("Errors from API: ", err);
-    }
+    Errors(err) { console.log("Errors from API: ", err); }
 }
